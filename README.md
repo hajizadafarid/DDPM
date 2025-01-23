@@ -21,19 +21,21 @@ A trained *reverse* (or *denoising*) process then recovers a clean sample from t
 
 - **Forward Process**  
   $$
-  q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) \;=\; 
+  q(\mathbf{x}_t \mid \mathbf{x}_{t-1})
+  =
   \mathcal{N}\!\Bigl(
       \mathbf{x}_t \,\Big|\,
-      \sqrt{1 - \beta_t}\,\mathbf{x}_{t-1},\; \beta_t \mathbf{I}
+      \sqrt{1 - \beta_t}\,\mathbf{x}_{t-1},\, \beta_t \mathbf{I}
   \Bigr).
   $$
 
 - **Reverse Process**  
   $$
-  p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t) \;=\; 
+  p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t)
+  =
   \mathcal{N}\!\Bigl(
       \mathbf{x}_{t-1} \,\Big|\,
-      \boldsymbol{\mu}_{\theta}(\mathbf{x}_t, t),\;
+      \boldsymbol{\mu}_{\theta}(\mathbf{x}_t, t),\,
       \boldsymbol{\Sigma}_{\theta}(\mathbf{x}_t, t)
   \Bigr).
   $$
