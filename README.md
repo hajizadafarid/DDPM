@@ -20,24 +20,25 @@ $\mathbf{x}_0$ from the real data distribution into a Gaussian noise $\mathbf{x}
 A trained *reverse* (or *denoising*) process then recovers a clean sample from the noise, step by step:
 
 - **Forward Process**  
-  $$
-  q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) \;=\; 
-  \mathcal{N}\!\Bigl(
+$$
+q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) \;=\;
+\mathcal{N}\!\Bigl(
     \mathbf{x}_t \,\Big|\,
-    \sqrt{1 - eta_t}\,\mathbf{x}_{t-1},\;eta_t \mathbf{I}
-  \Bigr).
-  $$
+    \sqrt{1 - \beta_t}\,\mathbf{x}_{t-1},\; \beta_t \mathbf{I}
+\Bigr).
+$$
+
 
 - **Reverse Process**  
-  $$
-  p_{	heta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t) 
-  \;=\; 
-  \mathcal{N}\!\Bigl(
+$$
+p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t) \;=\;
+\mathcal{N}\!\Bigl(
     \mathbf{x}_{t-1} \,\Big|\,
-    oldsymbol{\mu}_{	heta}(\mathbf{x}_t, t),\;
-    oldsymbol{\Sigma}_{	heta}(\mathbf{x}_t, t)
-  \Bigr).
-  $$
+    \boldsymbol{\mu}_{\theta}(\mathbf{x}_t, t),\;
+    \boldsymbol{\Sigma}_{\theta}(\mathbf{x}_t, t)
+\Bigr).
+$$
+
 
 - **Objective**  
   Learn the reverse noising steps by predicting the injected noise and minimizing a simple $\ell_2$ objective.  
@@ -147,30 +148,42 @@ The main logic is straightforward:
 1. **Forward Process**
 
    A noisy sample can be written as:
-   $$
-   \mathbf{x}_t \;=\; \sqrt{ar{lpha}_t}\,\mathbf{x}_0 \;+\; \sqrt{1 - ar{lpha}_t}\,oldsymbol{\epsilon},
-   $$
-   where $oldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).$
+$$
+\mathbf{x}_t \;=\; \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 \;+\; \sqrt{1 - \bar{\alpha}_t}\,\boldsymbol{\epsilon},
+$$
+where $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).$
+
 
 2. **Reverse Process** (single step)
 
    $$
-   \mathbf{x}_{t-1} \;\sim\; p_	hetaigl(\mathbf{x}_{t-1} \mid \mathbf{x}_tigr).
-   $$
+\mathbf{x}_{t-1} \;\sim\; p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t),
+$$
+with
+$$
+p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t) \;=\;
+\mathcal{N}\!\Bigl(
+    \mathbf{x}_{t-1} \,\Big|\,
+    \boldsymbol{\mu}_{\theta}(\mathbf{x}_t, t),\;
+    \boldsymbol{\Sigma}_{\theta}(\mathbf{x}_t, t)
+\Bigr).
+$$
+
 
 3. **Training Loss**  
-   The network is trained to predict the noise $oldsymbol{\epsilon}$ directly, yielding:
+   The network is trained to predict the noise $\oldsymbol{\epsilon}$ directly, yielding:
 
-   $$
-   \mathcal{L}_{\mathrm{simple}} 
-   \;=\;
-   \mathbb{E}_{t,\,\mathbf{x}_0,\,oldsymbol{\epsilon}}
-   \Bigl[
-     igl\|
-       oldsymbol{\epsilon} \;-\; oldsymbol{\epsilon}_	heta(\mathbf{x}_t, t)
-     igr\|^2
-   \Bigr].
-   $$
+  $$
+\mathcal{L}_{\mathrm{simple}}
+\;=\;
+\mathbb{E}_{t,\,\mathbf{x}_0,\,\boldsymbol{\epsilon}}
+\Bigl[
+    \bigl\|
+        \boldsymbol{\epsilon} \;-\; \boldsymbol{\epsilon}_{\theta}(\mathbf{x}_t, t)
+    \bigr\|^2
+\Bigr].
+$$
+
 
 You can find the relevant functions and classes in:
 - **2D Example**: `ddpm.py` and `network.py` (for the noise-prediction MLP).  
