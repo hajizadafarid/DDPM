@@ -20,25 +20,11 @@ $\mathbf{x}_0$ from the real data distribution into a Gaussian noise $\mathbf{x}
 A trained *reverse* (or *denoising*) process then recovers a clean sample from the noise, step by step:
 
 - **Forward Process**  
-  $$
-  q(\mathbf{x}_t \mid \mathbf{x}_{t-1})
-  =
-  \mathcal{N}\!\Bigl(
-      \mathbf{x}_t \,\Big|\,
-      \sqrt{1 - \beta_t}\,\mathbf{x}_{t-1},\, \beta_t \mathbf{I}
-  \Bigr).
-  $$
+  q_phi(x_t | x_{t-1}) = N(x_t | sqrt(1 - beta_t) * x_{t-1}, beta_t * I)
 
 - **Reverse Process**  
-  $$
-  p_{\theta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t)
-  =
-  \mathcal{N}\!\Bigl(
-      \mathbf{x}_{t-1} \,\Big|\,
-      \boldsymbol{\mu}_{\theta}(\mathbf{x}_t, t),\,
-      \boldsymbol{\Sigma}_{\theta}(\mathbf{x}_t, t)
-  \Bigr).
-  $$
+  p_theta(x_{t-1} | x_t) = N(x_{t-1} | mu_theta(x_t, t), Sigma_theta(x_t, t))
+
 
 
 - **Objective**  
