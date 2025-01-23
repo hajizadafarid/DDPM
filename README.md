@@ -136,7 +136,7 @@ The main logic is straightforward:
 
 The main logic is straightforward:
 
-1. **Forward Process**
+<!-- 1. **Forward Process**
 
 A noisy sample can be written as:
 $$
@@ -171,7 +171,22 @@ $$
         \boldsymbol{\epsilon} \;-\; \boldsymbol{\epsilon}_{\theta}(\mathbf{x}_t, t)
     \bigr\|^2
 \Bigr].
-$$
+$$ -->
+
+1. **Forward Process**
+
+A noisy sample can be written as:
+x_t = sqrt(alpha_t_bar) * x_0 + sqrt(1 - alpha_t_bar) * epsilon
+where `epsilon ~ N(0, I)`.
+
+2. **Reverse Process** (single step)
+x_(t-1) ~ p_theta(x_(t-1) | x_t)
+with
+p_theta(x_(t-1) | x_t) = N(x_(t-1) | mu_theta(x_t, t), Sigma_theta(x_t, t)).
+3. **Training Loss**
+
+The network is trained to predict the noise `epsilon` directly, yielding:
+L_simple = E[t, x_0, epsilon] [ ||epsilon - epsilon_theta(x_t, t)||^2 ].
 
 
 You can find the relevant functions and classes in:
