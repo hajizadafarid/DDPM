@@ -15,18 +15,32 @@ This repository demonstrates the implementation of **Denoising Diffusion Probabi
 
 ### 1. DDPM Recap
 
-DDPM is a latent-variable generative model in which data is gradually noised through a forward process, transforming a sample \(\mathbf{x}_0\) from the real data distribution into a Gaussian noise \(\mathbf{x}_T\). A trained *reverse* or *denoising* process then recovers a clean sample from the noise, step by step.
+DDPM is a latent-variable generative model in which data is gradually noised through a forward process, transforming a sample 
+$\mathbf{x}_0$ from the real data distribution into a Gaussian noise $\mathbf{x}_T.$ 
+A trained *reverse* (or *denoising*) process then recovers a clean sample from the noise, step by step:
 
-- **Forward Process**:
-  \[
-    q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) = \mathcal{N}\bigl(\mathbf{x}_t ; \sqrt{1 - \beta_t}\,\mathbf{x}_{t-1},\, \beta_t \mathbf{I}\bigr)
-  \]
-- **Reverse Process**:
-  \[
-    p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) 
-    = \mathcal{N}\!\Bigl(\mathbf{x}_{t-1} ; \boldsymbol{\mu}_\theta(\mathbf{x}_t, t), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t)\Bigr)
-  \]
-- **Objective**: Learn the reverse noising steps by predicting injected noise and minimizing a simple \(\ell_2\) objective.
+- **Forward Process**  
+  $$
+  q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) \;=\; 
+  \mathcal{N}\!\Bigl(
+    \mathbf{x}_t \,\Big|\,
+    \sqrt{1 - eta_t}\,\mathbf{x}_{t-1},\;eta_t \mathbf{I}
+  \Bigr).
+  $$
+
+- **Reverse Process**  
+  $$
+  p_{	heta}(\mathbf{x}_{t-1} \mid \mathbf{x}_t) 
+  \;=\; 
+  \mathcal{N}\!\Bigl(
+    \mathbf{x}_{t-1} \,\Big|\,
+    oldsymbol{\mu}_{	heta}(\mathbf{x}_t, t),\;
+    oldsymbol{\Sigma}_{	heta}(\mathbf{x}_t, t)
+  \Bigr).
+  $$
+
+- **Objective**  
+  Learn the reverse noising steps by predicting the injected noise and minimizing a simple $\ell_2$ objective.  
 
 For a thorough explanation, refer to the [DDPM paper](https://arxiv.org/abs/2006.11239) and Lilian Weng’s [blog post](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/).
 
@@ -81,7 +95,7 @@ Inside the `2d_plot_diffusion_todo` folder:
 
 1. Open `ddpm_tutorial.ipynb` (e.g., with Jupyter Notebook).
 2. Run the cells to:
-   - Train a DDPM on a 2D dataset (like Swiss Roll).
+   - Train a DDPM on a 2D dataset (e.g., Swiss Roll).
    - Visualize the forward process, reverse sampling, and final samples.
    - Evaluate the Chamfer Distance between generated samples and the ground truth distribution.
 
@@ -116,7 +130,7 @@ In `image_diffusion_todo`, we train and sample from a 64×64 DDPM on [AFHQ (Anim
    # Compute FID between real images and your generated images:
    python fid/measure_fid.py <AFHQ_VALIDATION_DIR> <OUTPUT_DIR>
    ```
-   > Make sure the `<AFHQ_VALIDATION_DIR>` points to valid AFHQ validation images (e.g., `data/afhq/eval`).
+   > Make sure `<AFHQ_VALIDATION_DIR>` points to valid AFHQ validation images (e.g., `data/afhq/eval`).
 
 Sample generated results and their measured FID:
 
@@ -130,23 +144,37 @@ Sample generated results and their measured FID:
 
 The main logic is straightforward:
 
-1. **Forward Process**:  
-   \[
-   \mathbf{x}_t \;=\; \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 \;+\; \sqrt{1 - \bar{\alpha}_t}\,\boldsymbol{\epsilon}
-   \]
-2. **Reverse Process** (one step):  
-   \[
-   \mathbf{x}_{t-1} \;\sim\; p_\theta\bigl(\mathbf{x}_{t-1} \mid \mathbf{x}_t\bigr)
-   \]
-3. **Training Loss**: Predict the noise \(\boldsymbol{\epsilon}\) injected into \(\mathbf{x}_0\):
-   \[
-   \mathcal{L}_{\text{simple}} 
-   = \mathbb{E}_{t,\,\mathbf{x}_0,\,\boldsymbol{\epsilon}}\Bigl[\bigl\|\boldsymbol{\epsilon} \;-\; \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\bigr\|^2\Bigr].
-   \]
+1. **Forward Process**
+
+   A noisy sample can be written as:
+   $$
+   \mathbf{x}_t \;=\; \sqrt{ar{lpha}_t}\,\mathbf{x}_0 \;+\; \sqrt{1 - ar{lpha}_t}\,oldsymbol{\epsilon},
+   $$
+   where $oldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).$
+
+2. **Reverse Process** (single step)
+
+   $$
+   \mathbf{x}_{t-1} \;\sim\; p_	hetaigl(\mathbf{x}_{t-1} \mid \mathbf{x}_tigr).
+   $$
+
+3. **Training Loss**  
+   The network is trained to predict the noise $oldsymbol{\epsilon}$ directly, yielding:
+
+   $$
+   \mathcal{L}_{\mathrm{simple}} 
+   \;=\;
+   \mathbb{E}_{t,\,\mathbf{x}_0,\,oldsymbol{\epsilon}}
+   \Bigl[
+     igl\|
+       oldsymbol{\epsilon} \;-\; oldsymbol{\epsilon}_	heta(\mathbf{x}_t, t)
+     igr\|^2
+   \Bigr].
+   $$
 
 You can find the relevant functions and classes in:
-- **2D Example**: `ddpm.py` and `network.py` (for noise-prediction MLP).  
-- **Image Generation**: `scheduler.py`, `model.py`, and `network.py` (U-Net).
+- **2D Example**: `ddpm.py` and `network.py` (for the noise-prediction MLP).  
+- **Image Generation**: `scheduler.py`, `model.py`, and `network.py` (the U-Net).
 
 ---
 
@@ -171,7 +199,4 @@ You can find the relevant functions and classes in:
 
 This project is adapted from materials of **KAIST CS492(D): Diffusion Models and Their Applications (Fall 2024)**. Special thanks to the course instructor and TAs for their excellent materials and guidance.
 
-If you use or modify this code, please retain this acknowledgment and the references to the original authors and sources. 
-
----
-
+If you use or modify this code, please retain this acknowledgment and the references to the original authors and sources.
